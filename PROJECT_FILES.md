@@ -1,0 +1,65 @@
+# Project File List
+
+```
+app/
+  (dashboard)/
+    layout.tsx
+    page.tsx
+    plan/page.tsx
+    settings/page.tsx
+    sport/[type]/page.tsx
+  api/
+    account/delete/route.ts
+    auth/[...nextauth]/route.ts
+    overview/route.ts
+    plan/generate/route.ts
+    strava/status/route.ts
+    strava/sync/route.ts
+  login/page.tsx
+components/
+  overview.tsx
+  plan-dashboard.tsx
+  providers.tsx
+  settings-panel.tsx
+  sidebar.tsx
+  sport-dashboard.tsx
+  top-nav.tsx
+  ui/
+    badge.tsx
+    button.tsx
+    card.tsx
+    input.tsx
+    select.tsx
+    sheet.tsx
+    skeleton.tsx
+    tabs.tsx
+lib/
+  auth.ts
+  crypto.ts
+  db.ts
+  plan-generator.ts
+  rate-limit.ts
+  strava.ts
+  units.ts
+  utils.ts
+prisma/
+  migrations/0001_init/migration.sql
+  schema.prisma
+schemas/
+  plan.ts
+  settings.ts
+types/
+  strava.ts
+  training.ts
+styles/
+  globals.css
+.env.example
+.gitignore
+next-env.d.ts
+next.config.mjs
+package.json
+postcss.config.cjs
+README.md
+tailwind.config.ts
+tsconfig.json
+```

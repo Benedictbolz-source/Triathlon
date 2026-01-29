@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String             @id @default(cuid())
+  name             String?
+  email            String?            @unique
+  emailVerified    DateTime?
+  image            String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  accounts         Account[]
+  sessions         Session[]
+  stravaConnection StravaConnection?
+  trainingPlans    TrainingPlan[]
+  activities       Activity[]
+}
+
+model StravaConnection {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  athleteId       String
+  accessTokenEnc  String
+  refreshTokenEnc String
+  expiresAt       DateTime
+  scopes          String
+  lastSyncAt      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Activity {
+  id                 String   @id @default(cuid())
+  userId             String
+  stravaId           String   @unique
+  type               String
+  distanceMeters     Float
+  movingTimeSeconds  Int
+  elapsedTimeSeconds Int
+  totalElevationGain Float
+  averageSpeed       Float?
+  averageHeartrate   Float?
+  startDate          DateTime
+  rawJson            Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  completedLinks     CompletedLink[]
+
+  @@index([userId, startDate])
+}
+
+model TrainingPlan {
+  id           String           @id @default(cuid())
+  userId       String
+  name         String
+  eventDate    DateTime
+  level        String
+  distanceGoal String
+  version      Int
+  weekCount    Int
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  sessions     PlannedSession[]
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PlannedSession {
+  id             String          @id @default(cuid())
+  trainingPlanId String
+  date           DateTime
+  sport          String
+  sessionType    String
+  description    String
+  durationMin    Int
+  intensity      String
+  distanceKm     Float?
+  notes          String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  trainingPlan   TrainingPlan    @relation(fields: [trainingPlanId], references: [id], onDelete: Cascade)
+  completedLink  CompletedLink?
+
+  @@index([trainingPlanId, date])
+}
+
+model CompletedLink {
+  id               String         @id @default(cuid())
+  plannedSessionId String         @unique
+  activityId       String         @unique
+  matchedBy        String
+  createdAt        DateTime       @default(now())
+  plannedSession   PlannedSession @relation(fields: [plannedSessionId], references: [id], onDelete: Cascade)
+  activity         Activity       @relation(fields: [activityId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
